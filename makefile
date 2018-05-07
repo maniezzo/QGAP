@@ -1,3 +1,5 @@
+#Makefile working for both Linux and Windows
+
 CXX = g++
 CXXFLAGS_WINDOWS = -g -Wall -O -DWINDOWS
 CXXFLAGS_LINUX = -g -Wall -O -DLINUX -std=c++0x -fpermissive -m64 -fPIC -fno-strict-aliasing
