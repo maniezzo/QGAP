@@ -4,7 +4,7 @@
 #ifdef LINUX
 #include "/opt/ibm/ILOG/CPLEX_Studio128/cplex/include/ilcplex/cplex.h"
 #else
-#include "c:/IBM/ILOG/CPLEX_Studio1263/cplex/include/ilcplex/cplex.h"
+#include <ilcplex/cplex.h>
 #endif
 #include <iostream>
 #include <fstream>   // ifstream
