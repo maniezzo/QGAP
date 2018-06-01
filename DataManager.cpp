@@ -733,3 +733,44 @@ int DataManager::readAmplSol(string infile)
    }
    return res;
 }
+
+// reads in the solution to start from
+vector<int> DataManager::readInitSol(string infile, string instance)
+{
+   string line;
+   vector<string> elem;
+   vector<int> sol;
+
+   string inst = instance.substr(0, instance.find(".", 0));
+   try
+   {
+      cout << "Reading " << infile << endl;
+      // data reading section
+      ifstream instFile;
+      instFile.open(infile);
+      instFile.exceptions(ifstream::eofbit | ifstream::failbit | ifstream::badbit);
+
+      do       // positioning on the significant line
+      {
+         getline(instFile, line);
+         line = Trim(line);
+         // cout << line << endl;
+      }
+      while(line.substr(0,inst.length()) != inst);
+
+      getline(instFile, line);
+      elem = split(line," ");
+
+      for(int i=0;i<elem.size();i++)
+         sol.push_back( atoi(elem[i].c_str() ) );
+      cout << sol[0] << endl;
+
+      instFile.close();
+   }
+   catch (std::exception const& e)
+   {
+      cout << "Error: " << e.what() << endl;
+   }
+
+   return sol;
+}
