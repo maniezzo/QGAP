@@ -1,5 +1,5 @@
 {
-   "datapath"  : "/home/stanekr/git/QGAP/TestInstances/",
+   "datapath"  : "c:/AAAToBackup/ricerche/GAP/quadratic/instances/cordeau/",
    "datafile"  : "10X5-E-G.json",
    "mode"      : 1, "_commentMode" : "1 optimize, 2 transcode, 3 check ampl sol",
    "opt_target": 4, "_commentOpt"  : "1 mipopt, 2 linear, 3 integer, 4 MagniGlass",
