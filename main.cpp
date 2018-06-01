@@ -25,6 +25,13 @@ int main()
          res = DM->readAmplSol(QGAP->conf->datapath + QGAP->conf->datafile);
          break;
       }
+      case 4:     // warm start
+      {  DM->readJSONdata(QGAP->conf->datapath + QGAP->conf->datafile);
+         string str = "c:\\AAAToBackup\\ricerche\\GAP\\quadratic\\graz\\QGAP_Results_23_5_2018_1.txt";
+         DM->readJSONdata(QGAP->conf->datapath + QGAP->conf->datafile);
+         DM->readInitSol(str,QGAP->conf->datafile);
+         break;
+      }
       default:
          cout << "Usupported use mode" << endl;
          break;

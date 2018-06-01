@@ -1,7 +1,7 @@
 {
    "datapath"  : "c:/AAAToBackup/ricerche/GAP/quadratic/instances/cordeau/",
-   "datafile"  : "10X5-E-G.json",
-   "mode"      : 1, "_commentMode" : "1 optimize, 2 transcode, 3 check ampl sol",
+   "datafile"  : "20-15-35.json",
+   "mode"      : 4, "_commentMode" : "1 optimize, 2 transcode, 3 check ampl sol 4 warm start",
    "opt_target": 4, "_commentOpt"  : "1 mipopt, 2 linear, 3 integer, 4 MagniGlass",
    "maxnodes"  : 500,
    "maxiter"   : 20,
