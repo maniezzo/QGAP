@@ -9,7 +9,8 @@ HeuMagnify::~HeuMagnify()
 {
 }
 
-void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_target)
+// magnifying glass vlsn procedure
+void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_target, vector<int> sol)
 {  int    i,j,n,m,status,solstat=0;
    double objval;
    double *x     = NULL;
@@ -27,7 +28,9 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
    slack = (double *)malloc(cur_numrows * sizeof(double));
    x     = (double *)malloc(cur_numcols * sizeof(double));   // initialize sol
    for(j=0;j<n;j++)  QGAP->solbest.push_back(-1);            // initialize ub sol
-   objval = simpleContruct(x);
+
+   if(sol.empty())
+      objval = simpleContruct(x);
 
    status = CPXsetintparam(env, CPXPARAM_MIP_Limits_Nodes, maxnodes);   // max num of nodes
    if (status)
