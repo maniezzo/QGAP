@@ -400,7 +400,6 @@ void DataManager::ampl2json(string infile)
 
    // data writing section
 
-
    string str = infile, str2 = "dat", str3 = "json";
    str = str.replace(str.find(str2), str2.length(), str3);
    QGAP->name = str;
@@ -656,6 +655,7 @@ void DataManager::leeMa2json(string infile)
    json2ampl(infile+".json");
 }
 
+// reads a 0/1 ampl solution
 int DataManager::readAmplSol(string infile)
 {
    string line;
