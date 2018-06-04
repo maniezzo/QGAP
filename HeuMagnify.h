@@ -22,12 +22,13 @@ public:
 
    HeuMagnify(QuadraticGAP*);
    ~HeuMagnify();
-   void MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_target);
+   void MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_target, vector<int> sol);
 
 private:
    double simpleContruct(double* x);
    void HeuMagnify::computeRegrets(double** c, int n, int m, vector<int> & regrets);
    double HeuMagnify::computeCost(double* x, int n, int m);
+   double HeuMagnify::computeCost(int* sol, int n, int m);
 };
 
 
