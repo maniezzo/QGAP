@@ -762,7 +762,7 @@ vector<int> DataManager::readInitSol(string infile, string instance)
       elem = split(line," ");
 
       for(int i=0;i<elem.size();i++)
-         sol.push_back( atoi(elem[i].c_str() ) );
+         sol.push_back( atoi(elem[i].c_str() )-1 );   // -1 to make data 0-based
       cout << sol[0] << endl;
 
       instFile.close();

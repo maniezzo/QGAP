@@ -135,7 +135,7 @@ int QuadraticGAP::Qopt (void)
    if (optimality_target==4)     // magnifying glass heuristic
    {  HeuMagnify* HMG;
       HMG = new HeuMagnify(this);
-      HMG->MagniGlass(env,lp,conf->maxnodes,3); // always QP opt
+      HMG->MagniGlass(env,lp,conf->maxnodes,3,solbest); // always QP opt
       delete HMG;
       goto TERMINATE;
    }
@@ -448,13 +448,16 @@ TERMINATE:
 }  // END setproblemdata
 
 double QuadraticGAP::eigenValues(double *qmatval, int n)
-{  int i,j,k;
+{  int i,j,k,sumMat;
+
+   Eigen::VectorXd evalues;
 
    Eigen::MatrixXd mat = Eigen::MatrixXd(n, n);
-   k = 0;
+   k = sumMat = 0;
    for(i=0;i<n;i++)
       for(j=0;j<n;j++)
       {  mat(i,j) = qmatval[k];
+         sumMat += mat(i,j);
          k++;
       }
 
@@ -474,13 +477,14 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
    nev_ Number of eigenvalues requested. This should satisfy 1<=nev<=n-1, where n is the size of matrix.
    ncv_ Parameter that controls the convergence speed of the algorithm. Typically a larger ncv_ means faster convergence, but it may also result in greater memory use and more matrix operations in each iteration.This parameter must satisfy nev<ncv<=n, and is advised to take ncv>=2nev.
    */
-
    SymEigsSolver< double, SMALLEST_ALGE, DenseSymMatProd<double> > eigs(&op, 1, n);
+
+   if (abs(det) > sumMat) goto lend;
+
    // Initialize and compute
    eigs.init();
    int nconv = eigs.compute();
    // Retrieve results
-   Eigen::VectorXd evalues;
    if (eigs.info() == SUCCESSFUL)
       evalues = eigs.eigenvalues();
    std::cout << "Smallest eigenvalues:" << evalues << std::endl;
@@ -495,7 +499,8 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
 
    cout << "Eigenvalues completed" << endl;
 
-   return evalues[0];
+lend:
+   return det;
 }
 
 // This simple routine frees up the pointer *ptr, and sets *ptr to NULL
@@ -544,7 +549,7 @@ int QuadraticGAP::checkfeas(double* x, double solcost)
             goto lend;
          }
 
-   // controllo capacit�
+   // controllo capacita'
    for (j = 0; j<n; j++)
    {  for(i=0;i<m;i++)
       {  capused[i] += x[i*n+j]*req[i][j];

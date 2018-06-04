@@ -31,19 +31,29 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
 
    if(sol.empty())
       objval = simpleContruct(x);
+   else
+   {
+      objval = computeCost(&sol[0],n,m);
+      for(i=0;i<m;i++)
+         for (j = 0; j<n; j++)
+            x[i*n + j] = 0;
+      for (j = 0; j<n; j++)
+         x[sol[j]*n + j] = 1;
+   }
 
    status = CPXsetintparam(env, CPXPARAM_MIP_Limits_Nodes, maxnodes);   // max num of nodes
    if (status)
    {  fprintf(stderr, "Failure to reset max tree search nodes, error %d.\n", status);
       goto TERMINATE;
    }
+   cout << "Max num of search nodes: " << maxnodes << endl;
 
-   cout << "Optimality target set to "<< optimality_target << endl;
    status = CPXsetintparam(env, CPXPARAM_OptimalityTarget, optimality_target);
    if (status)
    {  fprintf(stderr, "Failure to reset optimality target, error %d.\n", status);
       goto TERMINATE;
    }
+   cout << "Optimality target set to "<< optimality_target << endl;
 
    if(objval > DBL_MAX - QGAP->EPS)    // in case no solution was constructed
    {
@@ -240,17 +250,37 @@ void HeuMagnify::computeRegrets(double** c, int n, int m, vector<int> & regrets)
    }
 }
 
+// computes the cost from a 0/1 array
 double HeuMagnify::computeCost(double* x, int n, int m)
-{  double cost = 0;
-   int i,j,h,k;
+{
+   double cost = 0;
+   int i, j, h, k;
 
-   for(i=0;i<m;i++)
-      for(j=0;j<n;j++)
-      {  cost += x[i*n+j]*QGAP->cl[i][j]; // linear component
-         for(h=0;h<m;h++)
-            for(k=0;k<n;k++)
-               cost += QGAP->cqd[i][h]*QGAP->cqf[j][k]*x[i*n+j]*x[h*n+k];  // quadratic component
+   for (i = 0; i<m; i++)
+      for (j = 0; j<n; j++)
+      {
+         cost += x[i*n + j] * QGAP->cl[i][j]; // linear component
+         for (h = 0; h<m; h++)
+            for (k = 0; k<n; k++)
+               cost += QGAP->cqd[i][h] * QGAP->cqf[j][k] * x[i*n + j] * x[h*n + k];  // quadratic component
       }
+
+   return cost;
+}
+
+// computes the cost from an int valued array
+double HeuMagnify::computeCost(int* sol, int n, int m)
+{
+   double cost = 0;
+   int i, j, h, k;
+
+   for (j = 0; j<n; j++)
+   {  i = sol[j];
+      cost += sol[j] * QGAP->cl[i][j]; // linear component
+      for (h = 0; h<m; h++)
+         for (k = 0; k<n; k++)
+            cost += QGAP->cqd[i][h] * QGAP->cqf[j][k] * sol[j] * sol[k];  // quadratic component
+   }
 
    return cost;
 }
