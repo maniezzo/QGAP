@@ -152,11 +152,11 @@ TERMINATE:
 
 // Chooses to variables to fix
 double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
-{  int i,j;
+{  int i,j,numfix;
    double p;
 
    *cnt = 0;
-
+   numfix = (int) n*QGAP->conf->fixperc/100.0;
    for(i=0;i<m;i++)
       for(j=0;j<n;j++)
       {  p = rand()/(1.0*RAND_MAX) ;
