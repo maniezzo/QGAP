@@ -24,6 +24,7 @@ public:
    int isverbose;    // console output detail
    int maxnodes;     // max num of nodes expanded in the tree search
    int maxiter;      // max num of iteration of the heuristic
+   int selrule;      // rule to select variables to fix
 };
 
 class QuadraticGAP

@@ -1,10 +1,11 @@
 {
    "datapath"   : "c:/AAAToBackup/ricerche/GAP/quadratic/instances/cordeau/",
-   "datafile"   : "30-08-55.json",
+   "datafile"   : "20-15-55.json",
    "initsolfile": "c:\\AAAToBackup\\ricerche\\GAP\\quadratic\\graz\\QGAP_Results_23_5_2018_1.txt",
-   "mode"       : 4, "_commentMode" : "1 optimize, 2 transcode, 3 check ampl sol 4 warm start",
+   "mode"       : 4, "_commentMode" : "1 optimize, 2 transcode, 3 check ampl sol, 4 warm start",
    "opt_target" : 4, "_commentOpt"  : "1 mipopt, 2 linear, 3 integer, 4 MagniGlass",
    "fixperc"    : 60,"_commentfix"  : "perc of vars fixed at each iteration",
+   "selrule"    : 1, "_commentSel"  : "1 best, 2 half best half worst",
    "maxnodes"   : 500,
    "maxiter"    : 20,
    "isverbose"  : 1
