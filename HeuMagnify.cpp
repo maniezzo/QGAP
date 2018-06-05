@@ -119,30 +119,8 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
    iter = 0;
    do
    {  cout << "iter " << iter << " zub " << QGAP->zub << endl;
-      cnt = 0;
-      for(i=0;i<m;i++)
-         for(j=0;j<n;j++)
-         {  p = rand()/(1.0*RAND_MAX) ;
-            if(p < 0.3)
-            {
-               v_indices.push_back(i*n+j);
-               v_lu.push_back('B');				//both bounds will be set
-               v_bd.push_back(x[i*n+j]);				
-               cnt++;
-            }
-            else
-            {
-               v_indices.push_back(i*n+j);
-               v_lu.push_back('U');				//upper bound
-               v_bd.push_back(1);				
-               cnt++;
 
-               v_indices.push_back(i*n+j);
-               v_lu.push_back('L');				//lower bound
-               v_bd.push_back(0);				
-               cnt++;
-            }
-         }
+      status = fixVars(&cnt, m, n, x, v_indices, v_lu, v_bd);
 
       status = CPXchgbds (env, lp, cnt, &v_indices[0], &v_lu[0], &v_bd[0]);
 
@@ -173,9 +151,37 @@ TERMINATE:
 }
 
 // Chooses to variables to fix
-double HeuMagnify::fixVars(double* x)
-{
-   return 0;
+double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
+{  int i,j;
+   double p;
+
+   *cnt = 0;
+
+   for(i=0;i<m;i++)
+      for(j=0;j<n;j++)
+      {  p = rand()/(1.0*RAND_MAX) ;
+         if(p < 0.3)
+         {
+            v_indices.push_back(i*n+j);
+            v_lu.push_back('B');				//both bounds will be set
+            v_bd.push_back(x[i*n+j]);				
+            (*cnt)++;
+         }
+         else
+         {
+            v_indices.push_back(i*n+j);
+            v_lu.push_back('U');				//upper bound
+            v_bd.push_back(1);				
+            (*cnt)++;
+
+            v_indices.push_back(i*n+j);
+            v_lu.push_back('L');				//lower bound
+            v_bd.push_back(0);				
+            (*cnt)++;
+         }
+      }
+
+   return *cnt;
 }
 
 // constructive: each at the less requiring fecility

@@ -29,7 +29,7 @@ private:
    void HeuMagnify::computeRegrets(double** c, int n, int m, vector<int> & regrets);
    double HeuMagnify::computeCost(double* x, int n, int m);
    double HeuMagnify::computeCost(int* sol, int n, int m);
-   double HeuMagnify::fixVars(double* x);
+   double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd);
 };
 
 
