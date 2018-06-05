@@ -38,6 +38,8 @@ Config* DataManager::loadConfig()
    QGAP->conf->datapath = tempDatapath;
    string tempDatafile = JSV["datafile"];
    QGAP->conf->datafile = tempDatafile;
+   string tempSolfile = JSV["initsolfile"];
+   QGAP->conf->initsolfile = tempSolfile;
    QGAP->conf->mode = JSV["mode"];
    QGAP->conf->maxnodes = JSV["maxnodes"];
    QGAP->conf->maxiter  = JSV["maxiter"];

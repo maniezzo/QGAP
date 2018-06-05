@@ -172,6 +172,12 @@ TERMINATE:
    return;
 }
 
+// Chooses to variables to fix
+double HeuMagnify::fixVars(double* x)
+{
+   return 0;
+}
+
 // constructive: each at the less requiring fecility
 double HeuMagnify::simpleContruct(double* x)
 {  int i,ii,j,jj,m,n;

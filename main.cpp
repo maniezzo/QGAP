@@ -27,9 +27,7 @@ int main()
       }
       case 4:     // warm start
       {  DM->readJSONdata(QGAP->conf->datapath + QGAP->conf->datafile);
-         string str = "c:\\AAAToBackup\\ricerche\\GAP\\quadratic\\graz\\QGAP_Results_23_5_2018_1.txt";
-         DM->readJSONdata(QGAP->conf->datapath + QGAP->conf->datafile);
-         QGAP->solbest = DM->readInitSol(str,QGAP->conf->datafile);
+         QGAP->solbest = DM->readInitSol(QGAP->conf->initsolfile,QGAP->conf->datafile);
          QGAP->Qopt();
          break;
       }
