@@ -45,6 +45,8 @@ Config* DataManager::loadConfig()
    QGAP->conf->maxiter  = JSV["maxiter"];
    QGAP->conf->opt_target = JSV["opt_target"];
    QGAP->conf->isverbose  = JSV["isverbose"];
+   QGAP->conf->selrule    = JSV["selrule"];
+   QGAP->conf->fixperc    = JSV["fixperc"];
 
    srand(550);
    return QGAP->conf;
