@@ -154,16 +154,29 @@ TERMINATE:
 double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
 {  int i,j,numfix;
    double p;
+   vector<int> ind;
+   vector<bool> isFix;
 
    *cnt = 0;
-   numfix = (int) n*QGAP->conf->fixperc/100.0;
+   for(j=0;j<n;j++)
+   {  isFix.push_back(false);
+      ind.push_back(j);
+   }
+   shuffle(ind.begin(), ind.end(), std::default_random_engine());
+   shuffle(ind.begin(), ind.end(), std::default_random_engine());
+   shuffle(ind.begin(), ind.end(), std::default_random_engine());
+
+   numfix = (int)n*QGAP->conf->fixperc / 100.0;
+   for(j=0;j<numfix;j++)
+      isFix[ind[j]] = true;
+
    for(i=0;i<m;i++)
       for(j=0;j<n;j++)
-      {  p = rand()/(1.0*RAND_MAX) ;
-         if(p < 0.3)
+      {  
+         if(isFix[j])
          {
             v_indices.push_back(i*n+j);
-            v_lu.push_back('B');				//both bounds will be set
+            v_lu.push_back('B');				//both bounds will be set, fix variable
             v_bd.push_back(x[i*n+j]);				
             (*cnt)++;
          }

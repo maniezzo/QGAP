@@ -9,7 +9,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <algorithm> // sort
+#include <algorithm> // sort, shuffle
+#include <random>    // std::default_random_engine
 
 #include "QGAP.h"
 
