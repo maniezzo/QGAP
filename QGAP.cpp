@@ -11,6 +11,7 @@
 #include <cfloat>
 
 #include "HeuMagnify.h"
+#include "MTHG.h"
 
 using Eigen::MatrixXd;
 using namespace Spectra;
@@ -579,4 +580,25 @@ int QuadraticGAP::checkfeas(double* x, double solcost)
 
 lend:
    return res;
+}
+
+// Gilmore-Lawler-like costs
+int QuadraticGAP::GLcosts()
+{
+   int i,j,h,k,z;
+   MTHG* MT = new MTHG(this,z);
+   vector<vector<int>> zlin;
+   zlin.resize( n , vector<int>( m, 0 ) );
+
+   for(i=0;i<m;i++)
+      for(j=0;j<n;j++)
+      {
+         for(h=0;h<n;h++)
+            for(k=0;k<m;k++)
+               zlin[i][j]+=cqd[j][h]*cqf[i][k]+costlin[i][j];
+               MT->run_mthg(zlin);
+      }
+
+   delete MT;
+   return 0;
 }
