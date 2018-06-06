@@ -27,6 +27,7 @@ int main()
       }
       case 4:     // warm start
       {  DM->readJSONdata(QGAP->conf->datapath + QGAP->conf->datafile);
+         QGAP->GLcosts();
          QGAP->solbest = DM->readInitSol(QGAP->conf->initsolfile,QGAP->conf->datafile);
          QGAP->Qopt();
          break;

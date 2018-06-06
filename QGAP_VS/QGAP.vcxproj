@@ -155,6 +155,7 @@
     <ClInclude Include="..\DataManager.h" />
     <ClInclude Include="..\HeuMagnify.h" />
     <ClInclude Include="..\json.h" />
+    <ClInclude Include="..\MTHG.h" />
     <ClInclude Include="..\QGAP.h" />
   </ItemGroup>
   <ItemGroup>
@@ -162,6 +163,7 @@
     <ClCompile Include="..\HeuMagnify.cpp" />
     <ClCompile Include="..\json.cpp" />
     <ClCompile Include="..\main.cpp" />
+    <ClCompile Include="..\MTHG.cpp" />
     <ClCompile Include="..\QGAP.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

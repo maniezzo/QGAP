@@ -52,6 +52,7 @@ public:
 
    int Qopt(void);
    int checkfeas(double* x, double solcost);
+   int GLcosts();
 
 protected:
 private:
@@ -62,6 +63,7 @@ private:
       double **ub_p, char **ctype_p, int **qmatbeg_p, int **qmatcnt_p,
       int **qmatind_p, double **qmatval_p);
    double eigenValues(double *qmatval, int n);
+
 
    int optimality_target;  // convex function or not
 
