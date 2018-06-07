@@ -29,7 +29,7 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
    x     = (double *)malloc(cur_numcols * sizeof(double));   // initialize sol
    for(j=0;j<n;j++)  QGAP->solbest.push_back(-1);            // initialize ub sol
 
-   if(sol.empty())
+   if(sol.empty() || sol[0] == -1)
       objval = simpleContruct(x);
    else
    {
@@ -152,23 +152,46 @@ TERMINATE:
 
 // Chooses to variables to fix
 double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
-{  int i,j,numfix;
+{  int i,j,numfix,cont;
    double p;
-   vector<int> ind;
+   vector<int> ind,zglsol(n,0);
    vector<bool> isFix;
+
+   auto zglCost = [&zglsol](int a, int b) { return zglsol[a] < zglsol[b]; };           // ASC order
 
    *cnt = 0;
    for(j=0;j<n;j++)
    {  isFix.push_back(false);
       ind.push_back(j);
+      for(i=0;i<m;i++)
+         if(x[i*n + j]==1)
+            zglsol[j] = QGAP->zgl[i][j];
    }
+
+   std::sort(ind.begin(), ind.end(), zglCost);
+
+   cont = 0;   // num vars fixed so far
+   numfix = (int)n*QGAP->conf->fixperc / 100.0;
+   numfix = n-18;
+
+   shuffle(ind.begin(), ind.begin()+numfix, std::default_random_engine());
+   for(j=0;j<numfix/2;j++)    // fix in a candidate list the best numfix/2
+   {  isFix[ind[j]] = true;
+      cont++;
+   }
+
    shuffle(ind.begin(), ind.end(), std::default_random_engine());
    shuffle(ind.begin(), ind.end(), std::default_random_engine());
    shuffle(ind.begin(), ind.end(), std::default_random_engine());
 
-   numfix = (int)n*QGAP->conf->fixperc / 100.0;
-   for(j=0;j<numfix;j++)
-      isFix[ind[j]] = true;
+   while(cont<numfix)
+   {  for (j = 0; j<n; j++)    
+         if(!isFix[ind[j]])
+         {  isFix[ind[j]] = true;
+            cont++;
+            break;
+         }
+   }
 
    for(i=0;i<m;i++)
       for(j=0;j<n;j++)

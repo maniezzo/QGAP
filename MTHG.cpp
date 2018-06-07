@@ -27,8 +27,6 @@ int MTHG::run_mthg(vector<vector<int>> zlin)
 
    res = mthg_(&n, &m, p, w, QGAP->cap, 1, &zub, xstar, 1);
 
-   cout << "MTHG: zub = " << zub << " res= " << res << endl;
-
    if(xstar != NULL) free(xstar);
    if(p != NULL) free(p);
    if(w != NULL) free(w);
@@ -71,86 +69,86 @@ int MTHG::mthg_(int *n, int *m, int *p, int *w, int *c__, int minmax, int *z__, 
    // int A(50,500)
    a = (int *) malloc ((*m)*(*n) * sizeof(int));
 
-   /* THIS SUBROUTINE HEURISTICALLY SOLVES THE GENERALIZED ASSIGNMENT */
-   /* PROBLEM */
+   /* THIS SUBROUTINE HEURISTICALLY SOLVES THE GENERALIZED ASSIGNMENT      */
+   /* PROBLEM                                                              */
 
-   /* OPT Z = P(1,1)*X(1,1) + ... + P(1,N)*X(1,N) + */
-   /*                         ...                 + */
-   /*         P(M,1)*X(M,1) + ... + P(M,N)*X(M,N) */
+   /* OPT Z = P(1,1)*X(1,1) + ... + P(1,N)*X(1,N) +                        */
+   /*                         ...                 +                        */
+   /*         P(M,1)*X(M,1) + ... + P(M,N)*X(M,N)                          */
 
    /*     (WHERE  OPT = MIN  IF  MINMAX = 1 ,  OPT = MAX  IF  MINMAX = 2 ) */
 
    /* SUBJECT TO: */
 
-   /*       W(I,1)*X(I,1) + ... + W(I,N)*X(I,N) .LE. C(I)  FOR I=1,...,M, */
-   /*       X(1,J) + ... + X(M,J) = 1                      FOR J=1,...,N, */
-   /*       X(I,J) = 0 OR 1                     FOR I=1,...,M, J=1,...,N. */
+   /*       W(I,1)*X(I,1) + ... + W(I,N)*X(I,N) .LE. C(I)  FOR I=1,...,M,  */
+   /*       X(1,J) + ... + X(M,J) = 1                      FOR J=1,...,N,  */
+   /*       X(I,J) = 0 OR 1                     FOR I=1,...,M, J=1,...,N.  */
 
-   /* THE PROGRAM IS INCLUDED IN THE VOLUME */
-   /*   S. MARTELLO, P. TOTH, "KNAPSACK PROBLEMS: ALGORITHMS */
-   /*   AND COMPUTER IMPLEMENTATIONS", JOHN WILEY, 1990 */
-   /* AND IMPLEMENTS THE POLYNOMIAL-TIME ALGORITHMS DESCRIBED */
+   /* THE PROGRAM IS INCLUDED IN THE VOLUME                                */
+   /*   S. MARTELLO, P. TOTH, "KNAPSACK PROBLEMS: ALGORITHMS               */
+   /*   AND COMPUTER IMPLEMENTATIONS", JOHN WILEY, 1990                    */
+   /* AND IMPLEMENTS THE POLYNOMIAL-TIME ALGORITHMS DESCRIBED              */
    /* IN SECTION  7.4 . */
 
-   /* THE INPUT PROBLEM MUST SATISFY THE CONDITIONS */
+   /* THE INPUT PROBLEM MUST SATISFY THE CONDITIONS                        */
 
    /*   1) 2 .LE. M .LE. JDIMR ; */
    /*   2) 2 .LE. N .LE. JDIMC ; */
-   /*      ( JDIMR  AND  JDIMC  ARE DEFINED BY THE FIRST TWO EXECUTABLE */
+   /*      ( JDIMR  AND  JDIMC  ARE DEFINED BY THE FIRST TWO EXECUTABLE    */
    /*       STATEMENTS;) */
-   /*   3) P(I,J), W(I,J) AND C(I) POSITIVE intS; */
-   /*   4) W(I,J) .LE. C(I) FOR AT LEAST ONE I, FOR J=1,...,N; */
-   /*   5) C(I) .GE. MIN (W(I,J)) FOR I=1,...,M. */
+   /*   3) P(I,J), W(I,J) AND C(I) POSITIVE intS;                          */
+   /*   4) W(I,J) .LE. C(I) FOR AT LEAST ONE I, FOR J=1,...,N;             */
+   /*   5) C(I) .GE. MIN (W(I,J)) FOR I=1,...,M.                           */
 
-   /* MTHG CALLS 6 PROCEDURES: CHMTHG, FEAS, GHA, GHBCD, GHX AND TRIN. */
+   /* MTHG CALLS 6 PROCEDURES: CHMTHG, FEAS, GHA, GHBCD, GHX AND TRIN.     */
 
-   /* THE PROGRAM IS COMPLETELY SELF-CONTAINED AND COMMUNICATION TO IT IS */
-   /* ACHIEVED SOLELY THROUGH THE PARAMETER LIST OF MTHG. */
-   /* NO MACHINE-DEPENDENT CONSTANT IS USED. */
-   /* THE PROGRAM IS WRITTEN IN 1967 AMERICAN NATIONAL STANDARD FORTRAN */
-   /* AND IS ACCEPTED BY THE PFORT VERIFIER (PFORT IS THE PORTABLE */
-   /* SUBSET OF ANSI DEFINED BY THE ASSOCIATION FOR COMPUTING MACHINERY). */
-   /* THE PROGRAM HAS BEEN TESTED ON A DIGITAL VAX 11/780 AND AN H.P. */
-   /* 9000/840. */
+   /* THE PROGRAM IS COMPLETELY SELF-CONTAINED AND COMMUNICATION TO IT IS  */
+   /* ACHIEVED SOLELY THROUGH THE PARAMETER LIST OF MTHG.                  */
+   /* NO MACHINE-DEPENDENT CONSTANT IS USED.                               */
+   /* THE PROGRAM IS WRITTEN IN 1967 AMERICAN NATIONAL STANDARD FORTRAN    */
+   /* AND IS ACCEPTED BY THE PFORT VERIFIER (PFORT IS THE PORTABLE         */
+   /* SUBSET OF ANSI DEFINED BY THE ASSOCIATION FOR COMPUTING MACHINERY).  */
+   /* THE PROGRAM HAS BEEN TESTED ON A DIGITAL VAX 11/780 AND AN H.P.      */
+   /* 9000/840.                                                            */
 
    /* MTHG NEEDS */
-   /*   6 ARRAYS ( C ,  DMYR1 ,  DMYR2 ,  DMYR3 ,  DMYR4  AND  DMYR5 ) OF */
-   /*              LENGTH AT LEAST  JDIMR ; */
-   /*   7 ARRAYS ( XSTAR ,  BEST ,  DMYC1 ,  DMYC2 ,  DMYC3 ,  DMYC4  AND */
-   /*              DMYCR1 ) OF LENGTH AT LEAST  JDIMC ; */
-   /*   3 ARRAYS ( P ,  W  AND  A ) OF LENGTH AT LEAST  JDIMR X JDIMC . */
+   /*   6 ARRAYS ( C ,  DMYR1 ,  DMYR2 ,  DMYR3 ,  DMYR4  AND  DMYR5 ) OF  */
+   /*              LENGTH AT LEAST  JDIMR ;                                */
+   /*   7 ARRAYS ( XSTAR ,  BEST ,  DMYC1 ,  DMYC2 ,  DMYC3 ,  DMYC4  AND  */
+   /*              DMYCR1 ) OF LENGTH AT LEAST  JDIMC ;                    */
+   /*   3 ARRAYS ( P ,  W  AND  A ) OF LENGTH AT LEAST  JDIMR X JDIMC .    */
 
-   /* THE ARRAYS ARE CURRENTLY DIMENSIONED TO ALLOW PROBLEMS FOR WHICH */
-   /*       M .LE. 50 , */
-   /*       N .LE. 500 */
-   /* (SO, IN THE CALLING PROGRAM, ARRAYS  P  AND  W  MUST BE DIMENSIONED */
-   /* AT  (50,500) ). CHANGING SUCH LIMITS NECESSITATES CHANGING THE */
+   /* THE ARRAYS ARE CURRENTLY DIMENSIONED TO ALLOW PROBLEMS FOR WHICH     */
+   /*       M .LE. 50 ,                                                    */
+   /*       N .LE. 500                                                     */
+   /* (SO, IN THE CALLING PROGRAM, ARRAYS  P  AND  W  MUST BE DIMENSIONED  */
+   /* AT  (50,500) ). CHANGING SUCH LIMITS NECESSITATES CHANGING THE       */
    /* DIMENSION OF ALL THE ARRAYS IN SUBROUTINE MTHG, AS WELL AS THE FIRST */
-   /* TWO EXECUTABLE STATEMENTS. */
+   /* TWO EXECUTABLE STATEMENTS.                                           */
 
-   /* MEANING OF THE INPUT PARAMETERS: */
+   /* MEANING OF THE INPUT PARAMETERS:                                     */
    /* N        = NUMBER OF ITEMS; */
    /* M        = NUMBER OF KNAPSACKS; */
-   /* P(I,J)   = PROFIT OF ITEM J IF ASSIGNED TO KNAPSACK I */
+   /* P(I,J)   = PROFIT OF ITEM J IF ASSIGNED TO KNAPSACK I                */
    /*            (I=1,...,M; J=1,...,N); */
-   /* W(I,J)   = WEIGHT OF ITEM J IF ASSIGNED TO KNAPSACK I */
+   /* W(I,J)   = WEIGHT OF ITEM J IF ASSIGNED TO KNAPSACK I                */
    /*            (I=1,...,M; J=1,...,N); */
    /* C(I)     = CAPACITY OF KNAPSACK I (I=1,...,M); */
-   /* MINMAX   = 1 IF THE OBJECTIVE FUNCTION MUST BE MINIMIZED, */
-   /*          = 2 IF THE OBJECTIVE FUNCTION MUST BE MAXIMIZED; */
+   /* MINMAX   = 1 IF THE OBJECTIVE FUNCTION MUST BE MINIMIZED,            */
+   /*          = 2 IF THE OBJECTIVE FUNCTION MUST BE MAXIMIZED;            */
    /* JCK      = 1 IF CHECK ON THE INPUT DATA IS DESIRED, */
    /*          = 0 OTHERWISE. */
 
-   /* MEANING OF THE OUTPUT PARAMETERS: */
-   /* Z        = VALUE OF THE SOLUTION FOUND IF Z .GT. 0 , */
-   /*          = 0 IF NO FEASIBLE SOLUTION IS FOUND, */
+   /* MEANING OF THE OUTPUT PARAMETERS:                                    */
+   /* Z        = VALUE OF THE SOLUTION FOUND IF Z .GT. 0 ,                 */
+   /*          = 0 IF NO FEASIBLE SOLUTION IS FOUND,                       */
    /*          = ERROR IN THE INPUT DATA (WHEN JCK=1) IF Z .LT. 0 : CONDI- */
-   /*            TION  - Z  IS VIOLATED; */
-   /* XSTAR(J) = KNAPSACK WHERE ITEM J IS INSERTED IN THE SOLUTION FOUND. */
+   /*            TION  - Z  IS VIOLATED;                                   */
+   /* XSTAR(J) = KNAPSACK WHERE ITEM J IS INSERTED IN THE SOLUTION FOUND.  */
 
-   /* ALL THE PARAMETERS ARE int. ON RETURN OF MTHG ALL THE INPUT */
-   /* PARAMETERS ARE UNCHANGED, BUT  P(I,J)  IS SET TO  0  FOR ALL PAIRS */
-   /* (I,J)  SUCH THAT  W(I,J) .GT. C(I) . */
+   /* ALL THE PARAMETERS ARE int. ON RETURN OF MTHG ALL THE INPUT          */
+   /* PARAMETERS ARE UNCHANGED, BUT  P(I,J)  IS SET TO  0  FOR ALL PAIRS   */
+   /* (I,J)  SUCH THAT  W(I,J) .GT. C(I) .                                 */
 
 
    /* DEFINITION OF THE INTERNAL PARAMETERS. */

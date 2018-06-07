@@ -587,16 +587,25 @@ int QuadraticGAP::GLcosts()
 {
    int i,j,h,k,z;
    MTHG* MT = new MTHG(this,z);
+   MT->QGAP = this;
    vector<vector<int>> zlin;
-   zlin.resize( n , vector<int>( m, 0 ) );
+   zlin.resize( m , vector<int>( n, 0 ) );
+   zgl.resize(m, vector<int>(n, 0));
 
    for(i=0;i<m;i++)
       for(j=0;j<n;j++)
       {
-         for(h=0;h<n;h++)
-            for(k=0;k<m;k++)
-               zlin[i][j]+=cqd[j][h]*cqf[i][k]+costlin[i][j];
-               MT->run_mthg(zlin);
+         for (h = 0; h<m; h++)
+            for (k = 0; k<n; k++)
+               if(k!=j)
+               {  zlin[h][k] = cqd[i][h] * cqf[j][k];
+                  if(zlin[h][k] == 0) 
+                     zlin[h][k] = 1;   // well, it won't be a bound
+               }
+               else
+                  zlin[h][k] = (h==i && k==j ? 1 : 1000000);
+         zgl[i][j] = MT->run_mthg(zlin);     // WAtCHOUT! need to be integer costs
+         zgl[i][j] += cl[i][j];
       }
 
    delete MT;
