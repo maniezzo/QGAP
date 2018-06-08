@@ -45,8 +45,9 @@ public:
    int*  cap;    // server capacities
    double EPS = 0.0001;
 
-   double zub;          // best upper bound cost
-   vector<int> solbest; // best upper bound solution
+   double zub;                // best upper bound cost
+   vector<int> solbest;       // best upper bound solution
+   vector<vector<int>> zgl;   // linear cost estimations a' la gilmore-lawler
 
    Config* conf;
 
