@@ -172,7 +172,7 @@ double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_in
 
    cont = 0;   // num vars fixed so far
    numfix = (int)n*QGAP->conf->fixperc / 100.0;
-   numfix = n-18;
+   //numfix = n-18;
 
    shuffle(ind.begin(), ind.begin()+numfix, std::default_random_engine());
    for(j=0;j<numfix/2;j++)    // fix in a candidate list the best numfix/2
