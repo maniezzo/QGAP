@@ -136,7 +136,8 @@ int QuadraticGAP::Qopt (void)
    if (optimality_target==4)     // magnifying glass heuristic
    {  HeuMagnify* HMG;
       HMG = new HeuMagnify(this);
-      HMG->MagniGlass(env,lp,conf->maxnodes,3,solbest); // always QP opt
+      int inner_optimality_target = 3; // 1 convex. 2 not available for MIP, 3 heu
+      HMG->MagniGlass(env,lp,conf->maxnodes, inner_optimality_target,solbest); // always QP opt
       delete HMG;
       goto TERMINATE;
    }

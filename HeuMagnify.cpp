@@ -151,13 +151,14 @@ TERMINATE:
 }
 
 // Chooses to variables to fix
-double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
+int HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
 {  int i,j,numfix,cont;
    double p;
-   vector<int> ind,zglsol(n,0);
+   vector<int> ind;
+   vector<double> zglsol(n,0);
    vector<bool> isFix;
 
-   auto zglCost = [&zglsol](int a, int b) { return zglsol[a] < zglsol[b]; };           // ASC order
+   auto zglCost = [&zglsol](double a, double b) { return zglsol[a] < zglsol[b]; };           // ASC order
 
    *cnt = 0;
    for(j=0;j<n;j++)
@@ -165,7 +166,7 @@ double HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_in
       ind.push_back(j);
       for(i=0;i<m;i++)
          if(x[i*n + j]==1)
-            zglsol[j] = QGAP->zgl[i][j];
+            zglsol[j] = QGAP->zgl[i][j]/(double)QGAP->req[i][j];
    }
 
    std::sort(ind.begin(), ind.end(), zglCost);
