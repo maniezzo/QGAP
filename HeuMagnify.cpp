@@ -62,7 +62,7 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
          status = CPXqpopt(env, lp); // in case of non convex function (opt target > 1)
       if (status) 
       {  fprintf(stderr, "Failed to optimize QP.\n");
-      //goto TERMINATE;
+         //goto TERMINATE;
       }
 
       int nn = CPXgetsolnpoolnumsolns(env, lp);
@@ -101,7 +101,7 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
 
    // Write the output to the screen.
    cout << "\nConstruction solution status = " << solstat << endl;
-   cout << "Solution value  = " << objval << endl;
+   cout << "Solution value  = " << std::fixed << objval << endl;
    cout << "Solution:" << endl;
    for(i=0;i<cur_numcols;i++)
       cout << x[i] << " ";
@@ -142,7 +142,7 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
    }
    while (iter < maxiter);
 
-   cout << "Solution cost " << objval << " zub " << QGAP->zub << endl;
+   cout << "Solution cost " << std::fixed << objval << " zub " << QGAP->zub << endl;
 
 TERMINATE:
    free_and_null((char **)&x);

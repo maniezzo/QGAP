@@ -11,6 +11,7 @@
 #include <vector>
 #include <algorithm> // sort, shuffle
 #include <random>    // std::default_random_engine
+#include <sstream>   // std::ostringstream, std::fixed
 
 #include "QGAP.h"
 
