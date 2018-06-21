@@ -153,6 +153,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\DataManager.h" />
+    <ClInclude Include="..\HeuCHH.h" />
     <ClInclude Include="..\HeuMagnify.h" />
     <ClInclude Include="..\json.h" />
     <ClInclude Include="..\MTHG.h" />
@@ -160,6 +161,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\DataManager.cpp" />
+    <ClCompile Include="..\HeuCHH.cpp" />
     <ClCompile Include="..\HeuMagnify.cpp" />
     <ClCompile Include="..\json.cpp" />
     <ClCompile Include="..\main.cpp" />
