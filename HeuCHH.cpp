@@ -30,10 +30,10 @@ void HeuCHH::goCHH(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_targ
    for(j=0;j<n;j++)  QGAP->solbest.push_back(-1);            // initialize ub sol
 
    if(sol.empty() || sol[0] == -1)
-      objval = simpleContruct(x);
+      objval = -1;
    else
    {
-      objval = computeCost(&sol[0],n,m);
+      //objval = computeCost(&sol[0],n,m);
       for(i=0;i<m;i++)
          for (j = 0; j<n; j++)
             x[i*n + j] = 0;
@@ -120,7 +120,7 @@ void HeuCHH::goCHH(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_targ
    do
    {  cout << "iter " << iter << " zub " << QGAP->zub << endl;
 
-      status = fixVars(&cnt, m, n, x, v_indices, v_lu, v_bd);
+      //status = fixVars(&cnt, m, n, x, v_indices, v_lu, v_bd);
 
       status = CPXchgbds (env, lp, cnt, &v_indices[0], &v_lu[0], &v_bd[0]);
 
@@ -148,134 +148,4 @@ TERMINATE:
    free_and_null((char **)&x);
    free_and_null((char **)&slack);
    return;
-}
-
-// Chooses to variables to fix
-int HeuCHH::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
-{  int i,j,numfix,cont;
-   double p;
-   vector<int> ind;
-   vector<double> zglsol(n,0);
-   vector<bool> isFix;
-
-   auto zglCost = [&zglsol](double a, double b) { return zglsol[a] < zglsol[b]; };           // ASC order
-
-   *cnt = 0;
-   for(j=0;j<n;j++)
-   {  isFix.push_back(false);
-      ind.push_back(j);
-      for(i=0;i<m;i++)
-         if(x[i*n + j]==1)
-            zglsol[j] = QGAP->zgl[i][j]/(double)QGAP->req[i][j];
-   }
-
-   std::sort(ind.begin(), ind.end(), zglCost);
-
-   cont = 0;   // num vars fixed so far
-   numfix = (int)n*QGAP->conf->fixperc / 100.0;
-   //numfix = n-18;
-
-   shuffle(ind.begin(), ind.begin()+numfix, std::default_random_engine());
-   for(j=0;j<numfix/2;j++)    // fix in a candidate list the best numfix/2
-   {  isFix[ind[j]] = true;
-      cont++;
-   }
-
-   shuffle(ind.begin(), ind.end(), std::default_random_engine());
-   shuffle(ind.begin(), ind.end(), std::default_random_engine());
-   shuffle(ind.begin(), ind.end(), std::default_random_engine());
-
-   while(cont<numfix)
-   {  for (j = 0; j<n; j++)    
-         if(!isFix[ind[j]])
-         {  isFix[ind[j]] = true;
-            cont++;
-            break;
-         }
-   }
-
-   for(i=0;i<m;i++)
-      for(j=0;j<n;j++)
-      {  
-         if(isFix[j])
-         {
-            v_indices.push_back(i*n+j);
-            v_lu.push_back('B');				//both bounds will be set, fix variable
-            v_bd.push_back(x[i*n+j]);				
-            (*cnt)++;
-         }
-         else
-         {
-            v_indices.push_back(i*n+j);
-            v_lu.push_back('U');				//upper bound
-            v_bd.push_back(1);				
-            (*cnt)++;
-
-            v_indices.push_back(i*n+j);
-            v_lu.push_back('L');				//lower bound
-            v_bd.push_back(0);				
-            (*cnt)++;
-         }
-      }
-
-   return *cnt;
-}
-
-// constructive: each at the less requiring fecility
-double HeuMagnify::simpleContruct(double* x)
-{  int i,ii,j,jj,m,n;
-   double zub;
-
-   m = QGAP->m;
-   n = QGAP->n;
-   vector<int> cost(m),capleft(m),indReq(m);
-   vector<int> regrets(n),indCost(n),sol(n);
-   auto compCost = [&cost](int a, int b){ return cost[a] < cost[b]; };           // ASC order
-   auto compRegr = [&regrets](int a, int b){ return regrets[a] > regrets[b]; };  // DESC order
-
-   for(i=0;i<m;i++) capleft[i] = QGAP->cap[i];
-   computeRegrets(QGAP->cl,n,m,regrets);        // just for ordering in some way
-
-   for(j=0;j<n;j++) indCost[j] = j;
-   std::sort(indCost.begin(), indCost.end(), compRegr);
-
-   zub = 0;
-   for(jj=0;jj<n;jj++)
-   {  j = indCost[jj];  // client order by the function below
-      for(i=0;i<m;i++)
-      {  cost[i]= QGAP->req[i][j];
-         indReq[i] = i;
-      }
-
-      std::sort(indReq.begin(), indReq.end(), compCost);
-
-      ii=0;
-      while(ii<m)
-      {  i=indReq[ii];
-         if(capleft[i]>=QGAP->req[i][j])
-         {  sol[j]=i;
-            capleft[i] -= QGAP->req[i][j];
-            break;
-         }
-         ii++;
-      }
-      if(ii==m)
-      {  cout << "[SimpleConstruct] Error. ii="+ii << endl;
-         zub = DBL_MAX;
-         break;
-      }
-   }
-
-   for(i=0;i<m;i++)
-      for(j=0;j<n;j++)
-      {  x[i*n+j] = 0;
-         if(sol[j]==i)
-            x[i*n+j]=1;
-      }
-   zub = computeCost(x,n,m);
-   cout << "Construction terminated. Zub = " << zub << endl;
-   if(zub<DBL_MAX)
-      for(int k=0;k<n;k++) QGAP->solbest[k] = sol[k];
-
-   return zub;
 }

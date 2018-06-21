@@ -201,7 +201,7 @@ int QuadraticGAP::Qopt (void)
    int minind = -1;
    for(i=0;i<nn;i++)
    {  status = CPXgetsolnpoolobjval (env, lp, i, &objval);
-      cout << "Solution " << i << " cost " << objval << endl;
+      cout << "Solution " << i << " cost " << std::fixed << objval << endl;
       if(objval<mincost)
       {  minind = i;
          mincost = objval;
@@ -226,11 +226,11 @@ int QuadraticGAP::Qopt (void)
       cout << "Solution infeasible !!! status = " << status << endl;
       //goto TERMINATE;
    }
-   else cout << "Solution checked, status " << status << " cost " << objval << endl;
+   else cout << "Solution checked, status " << status << " cost " << std::fixed << objval << endl;
 
    // Write the output to the screen.
    cout << "\nSolution status = " << solstat << endl;
-   cout << "Solution value  = " << objval << endl;
+   cout << "Solution value  = " << std::fixed << objval << endl;
    cout << "Solution:" << endl;
    for(i=0;i<cur_numcols;i++)
       cout << x[i] << " ";
