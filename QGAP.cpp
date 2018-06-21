@@ -9,8 +9,8 @@
 #include <SymEigsSolver.h>  // Also includes <MatOp/DenseSymMatProd.h>
 #endif
 #include <cfloat>
-
 #include "HeuMagnify.h"
+#include "HeuCHH.h"
 #include "MTHG.h"
 
 using Eigen::MatrixXd;
@@ -134,7 +134,12 @@ int QuadraticGAP::Qopt (void)
       }
 
    if (optimality_target==4)     // magnifying glass heuristic
-   {  HeuMagnify* HMG;
+   {  
+      HeuCHH* HCHH = new HeuCHH(this);
+      HCHH->goCHH(env,lp,conf->maxnodes, -1,solbest); // always QP opt
+      delete HCHH;
+   
+      HeuMagnify* HMG;
       HMG = new HeuMagnify(this);
       int inner_optimality_target = 3; // 1 convex. 2 not available for MIP, 3 heu
       HMG->MagniGlass(env,lp,conf->maxnodes, inner_optimality_target,solbest); // always QP opt

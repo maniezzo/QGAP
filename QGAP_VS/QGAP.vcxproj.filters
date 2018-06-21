@@ -33,6 +33,9 @@
     <ClInclude Include="..\MTHG.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\HeuCHH.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\DataManager.cpp">
@@ -51,6 +54,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\MTHG.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\HeuCHH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
