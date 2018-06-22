@@ -19,9 +19,14 @@ void HeuCHH::goCHH(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_targ
    vector<char> v_lu;
    vector<double> v_bd;
 
-   cout << "Magnifying glass heuristic. Starting" << endl;
+   cout << "CHH heuristic. Starting" << endl;
    n = QGAP->n;
    m = QGAP->m;
+
+   if(n>0)  // DA IMPLEMENTARE!!!
+   {  cout << "TODO, exiting" << endl;
+      return;
+   }
 
    int cur_numrows = CPXgetnumrows(env, lp);
    int cur_numcols = CPXgetnumcols(env, lp);

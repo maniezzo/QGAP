@@ -486,7 +486,7 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
    */
    SymEigsSolver< double, SMALLEST_ALGE, DenseSymMatProd<double> > eigs(&op, 1, n);
 
-   if (abs(det) > sumMat) goto lend;
+   //if (abs(det) > sumMat) goto lend; 
 
    // Initialize and compute
    eigs.init();
@@ -494,7 +494,7 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
    // Retrieve results
    if (eigs.info() == SUCCESSFUL)
       evalues = eigs.eigenvalues();
-   std::cout << "Smallest eigenvalues:" << evalues << std::endl;
+   std::cout << "Smallest eigenvalues:" << fixed << evalues << std::endl;
 
    for (i = 0; i<n; i++)
       for (j = 0; j<n; j++)
@@ -502,7 +502,7 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
             if(evalues[0] < 0 && optimality_target == 1)
                qmatval[i*n+j] -= evalues[0];  // convexification
             else
-               qmatval[i*n + j] *= 2;  // all other coefficients will be doubled
+               qmatval[i*n + j] *= 2;  // all other coefficients will be doubled, CPLEX uses only upper triangular
 
    cout << "Eigenvalues completed" << endl;
 
