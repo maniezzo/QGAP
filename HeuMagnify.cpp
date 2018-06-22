@@ -152,7 +152,7 @@ TERMINATE:
 
 // Chooses to variables to fix
 int HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indices, vector<char> &v_lu, vector<double> &v_bd)
-{  int i,j,numfix,cont;
+{  int i,j,numfix,cont,selRule;
    double p;
    vector<int> ind;
    vector<double> zglsol(n,0);
@@ -160,7 +160,10 @@ int HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indic
 
    auto zglCost = [&zglsol](double a, double b) { return zglsol[a] < zglsol[b]; };           // ASC order
 
+   selRule = QGAP->conf->selrule;
+
    *cnt = 0;
+   // intializations
    for(j=0;j<n;j++)
    {  isFix.push_back(false);
       ind.push_back(j);
@@ -169,31 +172,39 @@ int HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indic
             zglsol[j] = QGAP->zgl[i][j]/(double)QGAP->req[i][j];
    }
 
-   std::sort(ind.begin(), ind.end(), zglCost);
+   cont = 0;                                    // num vars fixed so far
+   numfix = (int)n*QGAP->conf->fixperc / 100.0; // num vars to fix
 
-   cont = 0;   // num vars fixed so far
-   numfix = (int)n*QGAP->conf->fixperc / 100.0;
-   //numfix = n-18;
+   if(selRule <= 2)  // best or RCL
+   {
+      std::sort(ind.begin(), ind.end(), zglCost); // sort by increasing relative cost
 
-   shuffle(ind.begin(), ind.begin()+numfix, std::default_random_engine());
-   for(j=0;j<numfix/2;j++)    // fix in a candidate list the best numfix/2
-   {  isFix[ind[j]] = true;
-      cont++;
+      shuffle(ind.begin(), ind.begin()+numfix, std::default_random_engine()); // RCL of the best numfix
+      int limit = (selRule == 1 ? numfix : numfix/2);
+      for(j=0;j<limit;j++)    // fix in a candidate list the best numfix/2
+      {  isFix[ind[j]] = true;
+         cont++;
+      }
    }
 
-   shuffle(ind.begin(), ind.end(), std::default_random_engine());
-   shuffle(ind.begin(), ind.end(), std::default_random_engine());
-   shuffle(ind.begin(), ind.end(), std::default_random_engine());
+   // fix other numfix/2 random ones
+   if(selRule >= 2)
+   {
+      shuffle(ind.begin(), ind.end(), std::default_random_engine()); // three times for a bit a randomness
+      shuffle(ind.begin(), ind.end(), std::default_random_engine());
+      shuffle(ind.begin(), ind.end(), std::default_random_engine());
 
-   while(cont<numfix)
-   {  for (j = 0; j<n; j++)    
-         if(!isFix[ind[j]])
-         {  isFix[ind[j]] = true;
-            cont++;
-            break;
-         }
+      while(cont<numfix)
+      {  for (j = 0; j<n; j++)    
+            if(!isFix[ind[j]])
+            {  isFix[ind[j]] = true;
+               cont++;
+               break;
+            }
+      }
    }
 
+   // actual fixing for cplex
    for(i=0;i<m;i++)
       for(j=0;j<n;j++)
       {  
