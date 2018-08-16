@@ -27,7 +27,6 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
    int cur_numcols = CPXgetnumcols(env, lp);
    slack = (double *)malloc(cur_numrows * sizeof(double));
    x     = (double *)malloc(cur_numcols * sizeof(double));   // initialize sol
-   for(j=0;j<n;j++)  QGAP->solbest.push_back(-1);            // initialize ub sol
 
    if(sol.empty() || sol[0] == -1)
       objval = simpleContruct(x);
@@ -40,6 +39,11 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
       for (j = 0; j<n; j++)
          x[sol[j]*n + j] = 1;
    }
+
+   for(j=0;j<n;j++)  
+      for(i=0;i<m;i++)
+         if(x[i*n + j] > QGAP->EPS)
+            QGAP->solbest[j] = i;                  // initialize ub sol
 
    status = CPXsetintparam(env, CPXPARAM_MIP_Limits_Nodes, maxnodes);   // max num of nodes
    if (status)
@@ -97,7 +101,8 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
       cout << "Solution infeasible !!! status = " << status << endl;
       //goto TERMINATE;
    }
-   else cout << "Solution checked, status " << status << " cost " << objval << endl;
+   else 
+      cout << "Solution checked, status " << status << " cost " << objval << endl;
 
    // Write the output to the screen.
    cout << "\nConstruction solution status = " << solstat << endl;
@@ -135,7 +140,11 @@ void HeuMagnify::MagniGlass(CPXENVptr env, CPXLPptr lp, int maxnodes, int optima
       else
       {  if(objval < QGAP->zub)
          {  cout << "New zub!! " << objval << endl;
-            QGAP->zub = objval;
+            QGAP->saveZUB(x,objval);
+            for(j=0;j<n;j++)
+               for(i=0;i<m;i++)
+                  if(x[i*n + j] > QGAP->EPS)
+                     QGAP->solbest[j] = i;                  // initialize ub sol
          }
       }
       iter++;
@@ -235,7 +244,7 @@ int HeuMagnify::fixVars(int * cnt, int m, int n, double *x, vector<int> &v_indic
 // constructive: each at the less requiring fecility
 double HeuMagnify::simpleContruct(double* x)
 {  int i,ii,j,jj,m,n;
-   double zub;
+   double szub;
 
    m = QGAP->m;
    n = QGAP->n;
@@ -250,7 +259,7 @@ double HeuMagnify::simpleContruct(double* x)
    for(j=0;j<n;j++) indCost[j] = j;
    std::sort(indCost.begin(), indCost.end(), compRegr);
 
-   zub = 0;
+   szub = 0;
    for(jj=0;jj<n;jj++)
    {  j = indCost[jj];  // client order by the function below
       for(i=0;i<m;i++)
@@ -272,7 +281,7 @@ double HeuMagnify::simpleContruct(double* x)
       }
       if(ii==m)
       {  cout << "[SimpleConstruct] Error. ii="+ii << endl;
-         zub = DBL_MAX;
+         szub = DBL_MAX;
          break;
       }
    }
@@ -283,12 +292,12 @@ double HeuMagnify::simpleContruct(double* x)
          if(sol[j]==i)
             x[i*n+j]=1;
       }
-   zub = computeCost(x,n,m);
-   cout << "Construction terminated. Zub = " << zub << endl;
-   if(zub<DBL_MAX)
-      for(int k=0;k<n;k++) QGAP->solbest[k] = sol[k];
+   szub = computeCost(x,n,m);
+   cout << "Construction terminated. cost = " << szub << endl;
+   if(szub<DBL_MAX)
+      QGAP->saveZUB(&sol[0],szub);
 
-   return zub;
+   return szub;
 }
 
 // computes linear assignment regrets for each client

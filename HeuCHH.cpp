@@ -140,7 +140,7 @@ void HeuCHH::goCHH(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_targ
       else
       {  if(objval < QGAP->zub)
          {  cout << "New zub!! " << objval << endl;
-            QGAP->zub = objval;
+            QGAP->saveZUB(x,objval);
          }
       }
       iter++;

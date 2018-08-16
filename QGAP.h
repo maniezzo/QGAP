@@ -53,7 +53,10 @@ public:
 
    int Qopt(void);
    int checkfeas(double* x, double solcost);
+   int checkfeas(int* x, double solcost);
    int GLcosts();
+   void saveZUB(int* sol, double solcost);
+   void saveZUB(double* x, double solcost);
 
 protected:
 private:

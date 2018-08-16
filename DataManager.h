@@ -20,7 +20,8 @@ public:
    void readJSONdata(string);
    void transcode(string infile);
    int readAmplSol(string infile);
-   vector<int> DataManager::readInitSol(string infile, string instance);
+   vector<int> readInitSol(string infile, string instance);
+   void writeSol(string infile);
 
    QuadraticGAP* QGAP;
 

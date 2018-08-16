@@ -296,7 +296,7 @@ int QuadraticGAP::setproblemdata(char **probname_p, int *numcols_p, int *numrows
    int      *zmatind = NULL;
    double   *zmatval = NULL;
    double   *zlb = NULL;
-   double   *zub = NULL;
+   double   *zzub = NULL;
    char     *zctype = NULL;
    int      *zqmatbeg = NULL;
    int      *zqmatcnt = NULL;
@@ -318,7 +318,7 @@ int QuadraticGAP::setproblemdata(char **probname_p, int *numcols_p, int *numrows
    zmatind = (int *)malloc(numNZ * sizeof(int));
    zmatval = (double *)malloc(numNZ * sizeof(double));
    zlb = (double *)malloc(numCols * sizeof(double));
-   zub = (double *)malloc(numCols * sizeof(double));
+   zzub = (double *)malloc(numCols * sizeof(double));
    zctype = (char *)malloc(numCols * sizeof(char));
    zqmatbeg = (int *)malloc(numCols * sizeof(int));
    zqmatcnt = (int *)malloc(numCols * sizeof(int));
@@ -329,7 +329,7 @@ int QuadraticGAP::setproblemdata(char **probname_p, int *numcols_p, int *numrows
       zrhs == NULL || zsense == NULL ||
       zmatbeg == NULL || zmatcnt == NULL ||
       zmatind == NULL || zmatval == NULL ||
-      zlb == NULL || zub == NULL ||
+      zlb == NULL || zzub == NULL ||
       zqmatbeg == NULL || zqmatcnt == NULL ||
       zqmatind == NULL || zqmatval == NULL) {
       status = 1;
@@ -345,7 +345,7 @@ int QuadraticGAP::setproblemdata(char **probname_p, int *numcols_p, int *numrows
       {
          zobj[ij] = cl[i][j];
          zlb[ij] = 0;
-         zub[ij] = 1;
+         zzub[ij] = 1;
          zctype[ij] = 'I';
          ij++;
       }
@@ -421,7 +421,7 @@ TERMINATE:
       free_and_null((char **)&zmatind);
       free_and_null((char **)&zmatval);
       free_and_null((char **)&zlb);
-      free_and_null((char **)&zub);
+      free_and_null((char **)&zzub);
       free_and_null((char **)&zctype);
       free_and_null((char **)&zqmatbeg);
       free_and_null((char **)&zqmatcnt);
@@ -443,7 +443,7 @@ TERMINATE:
       *matind_p = zmatind;
       *matval_p = zmatval;
       *lb_p = zlb;
-      *ub_p = zub;
+      *ub_p = zzub;
       *ctype_p = zctype;
       *qmatbeg_p = zqmatbeg;
       *qmatcnt_p = zqmatcnt;
@@ -525,7 +525,7 @@ int QuadraticGAP::checkfeas(double* x, double solcost)
    int i, j;
    double cost = 0;
    double* capused = new double[m];
-   vector<int> sol (n);
+   vector<int> sol(n);
    bool isInteger = true;  // have got an integer solution
 
    for (i = 0; i<m; i++) 
@@ -588,6 +588,57 @@ lend:
    return res;
 }
 
+// checks the feasibility of a given solution
+int QuadraticGAP::checkfeas(int* sol, double solcost)
+{  int res = 0;  // solution ok
+   int i, j;
+   double cost,costlin,costq;
+   vector<double> capused(m);
+   bool isInteger = true;  // have got an integer solution
+
+   cost=costlin=costq = 0;
+   // controllo assegnamenti
+   if(isInteger)
+      for (j = 0; j<n; j++)
+         if (sol[j]<0 || sol[j] >= m)
+         {  res = 2;       // client assignment to a non-server
+            goto lend;
+         }
+
+   // controllo capacita'
+   for (j = 0; j<n; j++)
+   {  capused[sol[j]] += req[sol[j]][j];
+      for(i=0;i<m;i++)
+      if (capused[i] > cap[i])
+      {  res = 3;       // capacity exceeded
+         goto lend;
+      }
+   }
+
+   // check cost
+   for(j=0;j<n;j++)
+   {  costlin += cl[sol[j]][j];
+
+      for(int k=0;k<n;k++)
+         costq += cqd[sol[j]][sol[k]]*cqf[j][k];
+   }
+   cost = costlin+costq;
+   cout << "costlin = " << costlin << " costq = " << costq << " cost = " << cost << endl;
+
+   if (abs(solcost - cost) > EPS)
+   {  res = 4;       // unaligned costs
+      cout << "Solcost = " << solcost << " cost = " << cost << endl;
+      goto lend;
+   }
+
+lend:
+   if(res==0)
+      for(j=0;j<n;j++)
+         cout << solbest[j] << " ";
+   cout << " <== solbest" << endl;
+   return res;
+}
+
 // Gilmore-Lawler-like costs
 int QuadraticGAP::GLcosts()
 {
@@ -616,4 +667,45 @@ int QuadraticGAP::GLcosts()
 
    delete MT;
    return 0;
+}
+
+// saving best solution so far
+void QuadraticGAP::saveZUB(int* sol, double solcost)
+{
+   int j,res; 
+
+   res = checkfeas(sol, solcost);
+   if(res==0)
+   {  zub = solcost;
+      for(j=0;j<n;j++) solbest[j] = sol[j];
+   }
+   else
+      cout << "[saveZUB] Detected one arror" << endl;
+}
+
+void QuadraticGAP::saveZUB(double* x, double solcost)
+{
+   int i,j,res; 
+   vector<int> sol(n);
+
+   res = checkfeas(x, solcost);
+   if(res==0)
+   {  
+      for(j=0;j<n;j++)
+      {  sol[j] = -1;
+         for(i=0;i<m;i++)
+            if(x[i*n+j] > EPS)
+                sol[j] = i;
+      }
+   
+      res = checkfeas(&sol[0], solcost);
+      if(res==0)
+      {  zub = solcost;
+         for(j=0;j<n;j++) solbest[j] = sol[j];
+      }
+      else
+         cout << "[saveZUB] Detected one arror" << endl;
+   }
+   else
+      cout << "[saveZUB] Detected one arror" << endl;
 }

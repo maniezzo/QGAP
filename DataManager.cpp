@@ -83,33 +83,48 @@ void DataManager::readJSONdata(string infile)
    QGAP->zub = DBL_MAX;
    format  = JSV["format"];   // 1: single quad matrix, 2 two matrices to multiply
    QGAP->cap = (int*)malloc(QGAP->m * sizeof(int));
+   cout << "Capacities:" << endl;
    for (i = 0; i<JSV["cap"].size(); i++)
-      QGAP->cap[i] = JSV["cap"][i];
+   {  QGAP->cap[i] = JSV["cap"][i];
+      cout << QGAP->cap[i] << " ";
+   }
 
    QGAP->cl = (double**)malloc(QGAP->m * sizeof(double *));
+   cout << "\nCostlin:" << endl;
    for (i = 0; i<JSV["costlin"].size(); i++)
    {
       QGAP->cl[i] = (double*)malloc(QGAP->n * sizeof(double));
       for (j = 0; j<JSV["costlin"][i].size(); j++)
-         QGAP->cl[i][j] = JSV["costlin"][i][j];
+      {  QGAP->cl[i][j] = JSV["costlin"][i][j];
+         cout << QGAP->cl[i][j] << " ";
+      }
+      cout << endl;
    }
 
    if (format > 1)   // 2 matrices, distances and flows, d_ij, f_hk
    {
       QGAP->cqd = (double**)malloc(QGAP->m * sizeof(double *));
+      cout << "\nCostdist:" << endl;
       for (i = 0; i<JSV["costqd"].size(); i++)
       {
          QGAP->cqd[i] = (double*)malloc(QGAP->m * sizeof(double));
          for (j = 0; j<JSV["costqd"][i].size(); j++)
-            QGAP->cqd[i][j] = JSV["costqd"][i][j];
+         {  QGAP->cqd[i][j] = JSV["costqd"][i][j];
+            cout << QGAP->cqd[i][j] << " ";
+         }
+         cout << endl;
       }
 
       QGAP->cqf = (double**)malloc(QGAP->n * sizeof(double *));
+      cout << "\nCostflow" << endl;
       for (i = 0; i<JSV["costqf"].size(); i++)
       {
          QGAP->cqf[i] = (double*)malloc(QGAP->n * sizeof(double));
          for (j = 0; j<JSV["costqf"][i].size(); j++)
-            QGAP->cqf[i][j] = JSV["costqf"][i][j];
+         {  QGAP->cqf[i][j] = JSV["costqf"][i][j];
+            cout << QGAP->cqf[i][j] << " ";
+         }
+         cout << endl;
       }
    }
    else     // 1 matrix, c_ijhk
@@ -125,11 +140,15 @@ void DataManager::readJSONdata(string infile)
    }
 
    QGAP->req = (int**)malloc(QGAP->m * sizeof(int *));
+   cout << "\nRequests" << endl;
    for (i = 0; i<JSV["req"].size(); i++)
    {
       QGAP->req[i] = (int*)malloc(QGAP->n * sizeof(int));
       for (j = 0; j<JSV["req"][i].size(); j++)
-         QGAP->req[i][j] = JSV["req"][i][j];
+      {  QGAP->req[i][j] = JSV["req"][i][j];
+         cout << QGAP->req[i][j] << " ";
+      }
+      cout << endl;
    }
 
    cout << "JSON data read" << endl;;
@@ -777,4 +796,22 @@ vector<int> DataManager::readInitSol(string infile, string instance)
    }
 
    return sol;
+}
+
+// writes a solution
+void DataManager::writeSol(string infile)
+{
+   string str = infile;
+   if (endsWith(infile, "json"))
+   {
+      string str2 = ".json", str3 = ".soln";
+      str.replace(str.find(str2), str2.length(), str3);
+   }
+   
+   ofstream jsonFile;
+   jsonFile.open(str);
+   for(int j=0;j<QGAP->n;j++)
+      jsonFile << QGAP->solbest[j] << " ";
+   jsonFile.close();
+
 }

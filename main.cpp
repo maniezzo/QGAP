@@ -30,6 +30,7 @@ int main()
          QGAP->GLcosts();
          QGAP->solbest = DM->readInitSol(QGAP->conf->initsolfile,QGAP->conf->datafile);
          QGAP->Qopt();
+         DM->writeSol(QGAP->conf->datapath + QGAP->conf->datafile);
          break;
       }
       default:
