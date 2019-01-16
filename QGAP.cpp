@@ -4,7 +4,7 @@
 #include "Eigen/LU"         // for the determinant
 #include "SymEigsSolver.h"  // Also includes <MatOp/DenseSymMatProd.h>
 #else
-#include <Eigen/Core>
+#include <Eigen/Core>       // inclded from project->propoerties->compiler->directories
 #include <Eigen/LU>         // for the determinant
 #include <SymEigsSolver.h>  // Also includes <MatOp/DenseSymMatProd.h>
 #endif
