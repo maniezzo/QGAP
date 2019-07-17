@@ -472,40 +472,44 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
    double det = mat.determinant();
    cout << "Determinant: " << det << endl;
 
-   cout << "Computing eigenvalues" << endl;
-   Eigen::MatrixXd M = mat + mat.transpose();
-   // Construct matrix operation object 
-   DenseSymMatProd<double> op(M);
+   if (det >= DBL_MIN)
+      cout << "NOT computing eigenvalues" << endl;
+   else
+   {
+      cout << "Computing eigenvalues" << endl;
+      Eigen::MatrixXd M = mat + mat.transpose();
+      // Construct matrix operation object 
+      DenseSymMatProd<double> op(M);
 
-   /*
-   Construct eigen solver object, requesting the smallest / largest eigenvalues SMALLEST_MAGN / LARGEST_ALGE
-   Parameters
-   op_  Pointer to the matrix operation object, which should implement the matrix - vector multiplication operation of A: calculating Av for any vector v. Users could either create the object from the wrapper class such as DenseSymMatProd, or define their own that implements all the public member functions as in DenseSymMatProd.
-   nev_ Number of eigenvalues requested. This should satisfy 1<=nev<=n-1, where n is the size of matrix.
-   ncv_ Parameter that controls the convergence speed of the algorithm. Typically a larger ncv_ means faster convergence, but it may also result in greater memory use and more matrix operations in each iteration.This parameter must satisfy nev<ncv<=n, and is advised to take ncv>=2nev.
-   */
-   SymEigsSolver< double, SMALLEST_ALGE, DenseSymMatProd<double> > eigs(&op, 1, n);
+      /*
+      Construct eigen solver object, requesting the smallest / largest eigenvalues SMALLEST_MAGN / LARGEST_ALGE
+      Parameters
+      op_  Pointer to the matrix operation object, which should implement the matrix - vector multiplication operation of A: calculating Av for any vector v. Users could either create the object from the wrapper class such as DenseSymMatProd, or define their own that implements all the public member functions as in DenseSymMatProd.
+      nev_ Number of eigenvalues requested. This should satisfy 1<=nev<=n-1, where n is the size of matrix.
+      ncv_ Parameter that controls the convergence speed of the algorithm. Typically a larger ncv_ means faster convergence, but it may also result in greater memory use and more matrix operations in each iteration.This parameter must satisfy nev<ncv<=n, and is advised to take ncv>=2nev.
+      */
+      SymEigsSolver< double, SMALLEST_ALGE, DenseSymMatProd<double> > eigs(&op, 1, n);
 
-   //if (abs(det) > sumMat) goto lend; 
+      //if (abs(det) > sumMat) goto lend; 
 
-   // Initialize and compute
-   eigs.init();
-   int nconv = eigs.compute();
-   // Retrieve results
-   if (eigs.info() == SUCCESSFUL)
-      evalues = eigs.eigenvalues();
-   std::cout << "Smallest eigenvalues:" << fixed << evalues << std::endl;
+      // Initialize and compute
+      eigs.init();
+      int nconv = eigs.compute();
+      // Retrieve results
+      if (eigs.info() == SUCCESSFUL)
+         evalues = eigs.eigenvalues();
+      std::cout << "Smallest eigenvalues:" << fixed << evalues << std::endl;
 
-   for (i = 0; i<n; i++)
-      for (j = 0; j<n; j++)
-         if (i == j) 
-            if(evalues[0] < 0 && optimality_target == 1)
-               qmatval[i*n+j] -= evalues[0];  // convexification
-            else
-               qmatval[i*n + j] *= 2;  // all other coefficients will be doubled, CPLEX uses only upper triangular
+      for (i = 0; i < n; i++)
+         for (j = 0; j < n; j++)
+            if (i == j)
+               if (evalues[0] < 0 && optimality_target == 1)
+                  qmatval[i*n + j] -= evalues[0];  // convexification
+               else
+                  qmatval[i*n + j] *= 2;  // all other coefficients will be doubled, CPLEX uses only upper triangular
 
-   cout << "Eigenvalues completed" << endl;
-
+      cout << "Eigenvalues completed" << endl;
+   }
 lend:
    return det;
 }
