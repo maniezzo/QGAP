@@ -375,7 +375,8 @@ int QuadraticGAP::setproblemdata(char **probname_p, int *numcols_p, int *numrows
 
 
    // -------------------------- find eigenvalues
-   double evalue = eigenValues(zqmatval,i*j);
+   //double evalue = eigenValues(zqmatval,i*j);
+   double evalue = eigenValues(zqmatval,m*n);
    cout << "Eigenvalue: " << evalue << endl;
 
    // -------------------------- constraints section
@@ -488,15 +489,15 @@ double QuadraticGAP::eigenValues(double *qmatval, int n)
       nev_ Number of eigenvalues requested. This should satisfy 1<=nev<=n-1, where n is the size of matrix.
       ncv_ Parameter that controls the convergence speed of the algorithm. Typically a larger ncv_ means faster convergence, but it may also result in greater memory use and more matrix operations in each iteration.This parameter must satisfy nev<ncv<=n, and is advised to take ncv>=2nev.
       */
-      SymEigsSolver< double, SMALLEST_ALGE, DenseSymMatProd<double> > eigs(&op, 1, n);
+      SymEigsSolver< DenseSymMatProd<double> > eigs(op, 1, n);
 
       //if (abs(det) > sumMat) goto lend; 
 
       // Initialize and compute
       eigs.init();
-      int nconv = eigs.compute();
+      int nconv = eigs.compute(SortRule::SmallestAlge);
       // Retrieve results
-      if (eigs.info() == SUCCESSFUL)
+      if (eigs.info() == CompInfo::Successful)
          evalues = eigs.eigenvalues();
       std::cout << "Smallest eigenvalues:" << fixed << evalues << std::endl;
 
