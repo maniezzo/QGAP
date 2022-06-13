@@ -4,7 +4,7 @@
 #ifdef LINUX
 #include "cplex.h"
 #else
-#include <ilcplex/cplex.h>
+#include <cplex.h>
 #endif
 #include <iostream>
 #include <string>
