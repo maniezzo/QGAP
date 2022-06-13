@@ -118,7 +118,7 @@ void HeuCHH::goCHH(CPXENVptr env, CPXLPptr lp, int maxnodes, int optimality_targ
    // lu[j] 	= 'L' 	bd[j] is a lower bound
    // lu[j] 	= 'U' 	bd[j] is an upper bound
    // lu[j] 	= 'B' 	bd[j] is the lower and upper bound
-   int  iter,cnt,maxiter = QGAP->conf->maxiter;
+   int  iter,cnt=0,maxiter = QGAP->conf->maxiter;
    double p;
 
    iter = 0;
