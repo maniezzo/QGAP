@@ -282,7 +282,7 @@ double HeuMagnify::simpleContruct(double* x)
       if(ii==m)
       {  cout << "[SimpleConstruct] Error. ii="+ii << endl;
          szub = DBL_MAX;
-         break;
+         return szub;
       }
    }
 
